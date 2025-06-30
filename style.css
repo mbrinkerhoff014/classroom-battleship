@@ -4,14 +4,14 @@ body {
   padding: 20px;
 }
 
-#game-board {
+#board-container {
   display: inline-grid;
   grid-template-columns: 30px repeat(10, 30px);
   gap: 2px;
   margin-top: 20px;
 }
 
-#game-board div, .cell {
+#board-container div, .cell {
   width: 30px;
   height: 30px;
   border: 1px solid #555;
@@ -32,6 +32,7 @@ body {
   cursor: grab;
   border: 1px solid #333;
 }
+
 .hit { background-color: red; }
 .miss { background-color: lightgray; }
 .occupied { background-color: lightgreen; }

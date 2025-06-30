@@ -6,24 +6,23 @@ let currentPlayer = 0;
 let phase = "placement";
 let draggingSize = null;
 
-const board = document.getElementById("game-board");
+const boardContainer = document.getElementById("board-container");
 const instructions = document.getElementById("instructions");
 const status = document.getElementById("status");
 const doneBtn = document.getElementById("done-btn");
 
-// Build the board with headers
 function buildBoard() {
-  board.innerHTML = "";
-  board.appendChild(document.createElement("div")); // corner empty
+  boardContainer.innerHTML = "";
+  boardContainer.appendChild(document.createElement("div")); // corner empty
   for (let c = 0; c < GRID_SIZE; c++) {
     const label = document.createElement("div");
     label.textContent = String.fromCharCode(65 + c);
-    board.appendChild(label);
+    boardContainer.appendChild(label);
   }
   for (let r = 0; r < GRID_SIZE; r++) {
     const rowLabel = document.createElement("div");
     rowLabel.textContent = r + 1;
-    board.appendChild(rowLabel);
+    boardContainer.appendChild(rowLabel);
     for (let c = 0; c < GRID_SIZE; c++) {
       const cell = document.createElement("div");
       cell.className = "cell";
@@ -32,7 +31,7 @@ function buildBoard() {
       cell.ondragover = (e) => e.preventDefault();
       cell.ondrop = () => placeShip(r, c);
       cell.onclick = () => guess(r, c);
-      board.appendChild(cell);
+      boardContainer.appendChild(cell);
     }
   }
 }
@@ -60,9 +59,10 @@ function placeShip(x, y) {
   }
 
   draggingSize = null;
-  document.querySelector(`.ship[data-size='${draggingSize}']`)?.remove();
 
-  if (occupied.length === SHIP_SIZES.reduce((a, b) => a + b, 0)) {
+  const placed = occupied.length;
+  const totalNeeded = SHIP_SIZES.reduce((a, b) => a + b, 0);
+  if (placed >= totalNeeded) {
     doneBtn.style.display = "inline-block";
   }
 }
@@ -71,7 +71,7 @@ doneBtn.onclick = () => {
   if (currentPlayer === 0) {
     shipPlacements[0] = [...shipPlacements[0]];
     currentPlayer = 1;
-    instructions.textContent = "Player 2, drag and drop your ships.";
+    instructions.textContent = "Player 2: Drag your ships onto the board";
     resetBoard();
   } else {
     instructions.textContent = "Player 1's turn! Answer a card, then click to guess.";
@@ -83,7 +83,7 @@ doneBtn.onclick = () => {
 };
 
 function guess(x, y) {
-  if (phase !== "gameplay" || currentPlayer !== 0) return;
+  if (phase !== "gameplay") return;
   const opponent = (currentPlayer + 1) % 2;
   const cell = getCell(x, y);
   if (cell.classList.contains("hit") || cell.classList.contains("miss")) return;
@@ -91,14 +91,39 @@ function guess(x, y) {
   const hit = shipPlacements[opponent].some(([sx, sy]) => sx === x && sy === y);
   cell.classList.add(hit ? "hit" : "miss");
   status.textContent = hit ? "Hit!" : "Miss!";
-  if (!hit) currentPlayer = opponent;
+
+  if (hit) {
+    const allHits = boardContainer.querySelectorAll(".hit").length;
+    if (allHits >= SHIP_SIZES.reduce((a, b) => a + b, 0)) {
+      instructions.textContent = `Player ${currentPlayer + 1} Wins!`;
+      phase = "gameover";
+    }
+  } else {
+    currentPlayer = opponent;
+    instructions.textContent = `Player ${currentPlayer + 1}'s turn! Answer a card, then guess.`;
+  }
 }
 
 function getCell(x, y) {
-  return board.querySelector(`.cell[data-x='${x}'][data-y='${y}']`);
+  return boardContainer.querySelector(`.cell[data-x='${x}'][data-y='${y}']`);
 }
 
 function resetBoard() {
   buildBoard();
   doneBtn.style.display = "none";
+  document.querySelectorAll(".ship").forEach(ship => ship.remove());
+  if (currentPlayer === 1) addShipsToSelection();
+}
+
+function addShipsToSelection() {
+  const selection = document.getElementById("ship-selection");
+  SHIP_SIZES.forEach(size => {
+    const ship = document.createElement("div");
+    ship.className = "ship";
+    ship.draggable = true;
+    ship.dataset.size = size;
+    ship.textContent = `🚢 ${size}`;
+    ship.ondragstart = () => draggingSize = size;
+    selection.appendChild(ship);
+  });
 }
