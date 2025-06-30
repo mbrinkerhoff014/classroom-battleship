@@ -33,6 +33,11 @@ body {
   border: 1px solid #333;
 }
 
+.ship.vertical {
+  writing-mode: vertical-rl;
+}
+
+
 .hit { background-color: red; }
 .miss { background-color: lightgray; }
 .occupied { background-color: lightgreen; }

@@ -5,6 +5,8 @@ let guesses = [[], []];
 let currentPlayer = 0;
 let phase = "placement";
 let draggingSize = null;
+let isVertical = false;
+
 
 const boardContainer = document.getElementById("board-container");
 const instructions = document.getElementById("instructions");
@@ -45,18 +47,26 @@ document.querySelectorAll(".ship").forEach(ship => {
 });
 
 function placeShip(x, y) {
-  if (draggingSize == null) return;
+ if (isVertical) {
+  if (y + draggingSize > GRID_SIZE) return;
+  for (let i = 0; i < draggingSize; i++) {
+    if (occupied.some(([sx, sy]) => sx === x && sy === y + i)) return;
+  }
+  for (let i = 0; i < draggingSize; i++) {
+    occupied.push([x, y + i]);
+    getCell(x, y + i).classList.add("occupied");
+  }
+} else {
   if (x + draggingSize > GRID_SIZE) return;
-
-  const occupied = shipPlacements[currentPlayer];
   for (let i = 0; i < draggingSize; i++) {
     if (occupied.some(([sx, sy]) => sx === x + i && sy === y)) return;
   }
-
   for (let i = 0; i < draggingSize; i++) {
     occupied.push([x + i, y]);
     getCell(x + i, y).classList.add("occupied");
   }
+  }
+}
 
   draggingSize = null;
 
@@ -127,3 +137,11 @@ function addShipsToSelection() {
     selection.appendChild(ship);
   });
 }
+
+document.getElementById("rotate-btn").onclick = () => {
+  isVertical = !isVertical;
+  document.querySelectorAll(".ship").forEach(ship =>
+    ship.classList.toggle("vertical", isVertical)
+  );
+};
+
