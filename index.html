@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classroom Battleship</title>
+  <script defer src="script.js"></script>
+  <style>
+    body { font-family: sans-serif; text-align: center; }
+    .board { display: grid; grid-template-columns: repeat(5, 40px); gap: 4px; margin: 10px auto; }
+    button { width: 40px; height: 40px; font-size: 18px; }
+    .hit { background-color: red; }
+    .miss { background-color: lightgray; }
+  </style>
+</head>
+<body>
+  <h1>Classroom Battleship</h1>
+  <p id="instructions">Player 1, place your ships!</p>
+  <div id="boards"></div>
+  <button id="newGameBtn" style="display:none;">New Game</button>
+</body>
+</html>
