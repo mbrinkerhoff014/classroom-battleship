@@ -5,8 +5,8 @@ body {
 }
 
 #board-container {
-  display: inline-grid;
-  grid-template-columns: 30px repeat(10, 30px);
+  display: grid;
+  grid-template-columns: 30px repeat(10, 30px); /* Label column + 10 grid columns */
   gap: 2px;
   margin-top: 20px;
 }
@@ -26,7 +26,7 @@ body {
 
 .ship {
   display: inline-block;
-  padding: 5px 10px;
+  padding: 5px;
   margin: 5px;
   background: lightblue;
   cursor: grab;
@@ -35,8 +35,9 @@ body {
 
 .ship.vertical {
   writing-mode: vertical-rl;
+  text-orientation: mixed;
+  height: auto;
 }
-
 
 .hit { background-color: red; }
 .miss { background-color: lightgray; }
