@@ -7,7 +7,6 @@ let phase = "placement";
 let draggingSize = null;
 let isVertical = false;
 
-
 const boardContainer = document.getElementById("board-container");
 const instructions = document.getElementById("instructions");
 const status = document.getElementById("status");
@@ -16,15 +15,18 @@ const doneBtn = document.getElementById("done-btn");
 function buildBoard() {
   boardContainer.innerHTML = "";
   boardContainer.appendChild(document.createElement("div")); // corner empty
+
   for (let c = 0; c < GRID_SIZE; c++) {
     const label = document.createElement("div");
     label.textContent = String.fromCharCode(65 + c);
     boardContainer.appendChild(label);
   }
+
   for (let r = 0; r < GRID_SIZE; r++) {
     const rowLabel = document.createElement("div");
     rowLabel.textContent = r + 1;
     boardContainer.appendChild(rowLabel);
+
     for (let c = 0; c < GRID_SIZE; c++) {
       const cell = document.createElement("div");
       cell.className = "cell";
@@ -46,33 +48,40 @@ document.querySelectorAll(".ship").forEach(ship => {
   };
 });
 
+document.getElementById("rotate-btn").onclick = () => {
+  isVertical = !isVertical;
+  document.querySelectorAll(".ship").forEach(ship =>
+    ship.classList.toggle("vertical", isVertical)
+  );
+};
+
 function placeShip(x, y) {
- if (isVertical) {
-  if (y + draggingSize > GRID_SIZE) return;
-  for (let i = 0; i < draggingSize; i++) {
-    if (occupied.some(([sx, sy]) => sx === x && sy === y + i)) return;
+  if (draggingSize == null) return;
+  const occupied = shipPlacements[currentPlayer];
+
+  if (isVertical) {
+    if (y + draggingSize > GRID_SIZE) return;
+    for (let i = 0; i < draggingSize; i++) {
+      if (occupied.some(([sx, sy]) => sx === x && sy === y + i)) return;
+    }
+    for (let i = 0; i < draggingSize; i++) {
+      occupied.push([x, y + i]);
+      getCell(x, y + i).classList.add("occupied");
+    }
+  } else {
+    if (x + draggingSize > GRID_SIZE) return;
+    for (let i = 0; i < draggingSize; i++) {
+      if (occupied.some(([sx, sy]) => sx === x + i && sy === y)) return;
+    }
+    for (let i = 0; i < draggingSize; i++) {
+      occupied.push([x + i, y]);
+      getCell(x + i, y).classList.add("occupied");
+    }
   }
-  for (let i = 0; i < draggingSize; i++) {
-    occupied.push([x, y + i]);
-    getCell(x, y + i).classList.add("occupied");
-  }
-} else {
-  if (x + draggingSize > GRID_SIZE) return;
-  for (let i = 0; i < draggingSize; i++) {
-    if (occupied.some(([sx, sy]) => sx === x + i && sy === y)) return;
-  }
-  for (let i = 0; i < draggingSize; i++) {
-    occupied.push([x + i, y]);
-    getCell(x + i, y).classList.add("occupied");
-  }
-  }
-}
 
   draggingSize = null;
 
-  const placed = occupied.length;
-  const totalNeeded = SHIP_SIZES.reduce((a, b) => a + b, 0);
-  if (placed >= totalNeeded) {
+  if (occupied.length >= SHIP_SIZES.reduce((a, b) => a + b, 0)) {
     doneBtn.style.display = "inline-block";
   }
 }
@@ -103,8 +112,8 @@ function guess(x, y) {
   status.textContent = hit ? "Hit!" : "Miss!";
 
   if (hit) {
-    const allHits = boardContainer.querySelectorAll(".hit").length;
-    if (allHits >= SHIP_SIZES.reduce((a, b) => a + b, 0)) {
+    const hits = boardContainer.querySelectorAll(".hit").length;
+    if (hits >= SHIP_SIZES.reduce((a, b) => a + b, 0)) {
       instructions.textContent = `Player ${currentPlayer + 1} Wins!`;
       phase = "gameover";
     }
@@ -133,15 +142,8 @@ function addShipsToSelection() {
     ship.draggable = true;
     ship.dataset.size = size;
     ship.textContent = `🚢 ${size}`;
+    ship.style.width = `${size * 30}px`;
     ship.ondragstart = () => draggingSize = size;
     selection.appendChild(ship);
   });
 }
-
-document.getElementById("rotate-btn").onclick = () => {
-  isVertical = !isVertical;
-  document.querySelectorAll(".ship").forEach(ship =>
-    ship.classList.toggle("vertical", isVertical)
-  );
-};
-
