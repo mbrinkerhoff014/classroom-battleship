@@ -219,7 +219,7 @@ function makeGuess(x, y) {
 
   const opponent = (currentPlayer + 1) % 2;
 
-  // Prevent guessing the same square twice
+  // Prevent repeated guesses
   if (guesses[currentPlayer].some((g) => g.x === x && g.y === y)) return;
 
   const ships = placedShips[opponent];
@@ -238,17 +238,7 @@ function makeGuess(x, y) {
 
   guesses[currentPlayer].push({ x, y, hit });
 
-  if (hit) {
-    status.textContent = "Hit! You get another turn.";
-    buildBoard(opponent); // Stay on opponent's board for next guess
-  } else {
-    status.textContent = "Miss! Switching to opponent's turn.";
-    currentPlayer = opponent;
-    instructions.textContent = `Player ${currentPlayer + 1}'s turn! Click opponent's grid to guess.`;
-    buildBoard((currentPlayer + 1) % 2); // Show new opponent's board immediately
-  }
-
-  // Win Check
+  // Check for Win Before Switching Boards
   const totalHits = guesses[currentPlayer].filter((g) => g.hit).length;
   const totalShipCells = SHIP_SIZES.reduce((a, b) => a + b);
 
@@ -258,6 +248,17 @@ function makeGuess(x, y) {
     doneBtn.style.display = "inline-block";
     doneBtn.textContent = "Restart";
     status.textContent = "";
+    return;
+  }
+
+  if (hit) {
+    status.textContent = "Hit! You get another turn.";
+    buildBoard(opponent); // Stay on opponent's board
+  } else {
+    status.textContent = "Miss! Switching to opponent's turn.";
+    currentPlayer = opponent;
+    instructions.textContent = `Player ${currentPlayer + 1}'s turn! Click opponent's grid to guess.`;
+    buildBoard((currentPlayer + 1) % 2); // Switch to new opponent's board instantly
   }
 }
 
