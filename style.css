@@ -1,15 +1,16 @@
 body {
   font-family: Arial, sans-serif;
   text-align: center;
+  margin: 20px;
 }
 
 h1 {
   font-size: 28px;
-  margin-top: 20px;
 }
 
 h2 {
-  font-size: 20px;
+  font-size: 22px;
+  font-weight: bold;
   margin-bottom: 10px;
 }
 
@@ -27,21 +28,36 @@ h2 {
   cursor: grab;
   text-align: center;
   box-sizing: border-box;
+  user-select: none;
   overflow: hidden;
+  width: calc(30px * var(--size));
+  height: 30px;
   line-height: 30px;
+  font-size: 16px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
 }
 
 .ship.vertical {
+  width: 30px !important;
+  height: calc(30px * var(--size)) !important;
   writing-mode: vertical-rl;
   text-orientation: mixed;
   line-height: normal;
+  font-size: 14px;
+  padding-top: 5px;
+}
+
+.ship:hover {
+  background-color: deepskyblue;
 }
 
 #board-container {
   display: grid;
   grid-template-columns: 30px repeat(10, 30px);
   justify-content: center;
-  margin: 15px 0;
+  margin: 15px auto;
+  user-select: none;
 }
 
 #board-container > div {
@@ -50,27 +66,51 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: bold;
 }
 
 .cell {
   border: 1px solid #555;
+  cursor: pointer;
+  background-color: white;
+  transition: background-color 0.3s ease;
 }
 
 .cell.occupied {
   background-color: lightgreen;
-  cursor: pointer;
 }
 
 .cell.hit {
   background-color: red;
+  color: white;
+  font-weight: bold;
 }
 
 .cell.miss {
   background-color: lightgray;
+  color: black;
+  font-weight: bold;
 }
 
 button {
   margin-top: 10px;
-  padding: 8px 15px;
-  font-size: 16px;
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 6px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+#status {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 10px;
+  min-height: 24px;
 }
