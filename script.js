@@ -6,14 +6,12 @@ let currentPlayer = 0;
 let phase = "placement"; 
 let draggingSize = null;
 let draggingShipElement = null;
-let isVertical = false;
 
 const boardContainer = document.getElementById("board-container");
 const instructions = document.getElementById("instructions");
 const status = document.getElementById("status");
 const doneBtn = document.getElementById("done-btn");
 const shipSelectionDiv = document.getElementById("ship-selection");
-const rotateBtn = document.getElementById("rotate-btn");
 
 function resetShipSelections() {
   shipSelections = [SHIP_SIZES.slice(), SHIP_SIZES.slice()];
@@ -84,14 +82,13 @@ function createShipElement(size) {
   ship.className = "ship";
   ship.draggable = true;
   ship.dataset.size = size;
-  ship.dataset.vertical = "false"; // Default horizontal
+  ship.dataset.vertical = "false";
   ship.textContent = `🚢 ${size}`;
   ship.style.width = `${size * 30}px`;
   ship.style.height = "30px";
 
-  // Click to rotate
   ship.onclick = (e) => {
-    e.preventDefault(); // Prevent accidental drag on click
+    e.preventDefault();
     const vertical = ship.dataset.vertical === "true";
     if (vertical) {
       ship.dataset.vertical = "false";
@@ -256,11 +253,6 @@ function guess(x, y) {
   instructions.textContent = `Player ${currentPlayer + 1}'s turn! Answer a card, then guess.`;
   buildBoard(currentPlayer === 0 ? 1 : 0, false);
 }
-
-rotateBtn.onclick = () => {
-  isVertical = !isVertical;
-  renderShipSelection();
-};
 
 function resetGame() {
   resetShipSelections();
