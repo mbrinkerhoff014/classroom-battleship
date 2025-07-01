@@ -118,18 +118,16 @@ function renderShipSelection() {
 function placeShip(x, y) {
   if (draggingSize == null) return;
 
-  // Flip the orientation when placing
-  const flippedVertical = !draggingVertical;
-
-  if (flippedVertical) {
-    if (y + draggingSize > GRID_SIZE) return;
-    for (let i = 0; i < draggingSize; i++) {
-      if (isOccupied(x, y + i)) return;
-    }
-  } else {
+  // Use current dragging orientation exactly as previewed
+  if (draggingVertical) {
     if (x + draggingSize > GRID_SIZE) return;
     for (let i = 0; i < draggingSize; i++) {
       if (isOccupied(x + i, y)) return;
+    }
+  } else {
+    if (y + draggingSize > GRID_SIZE) return;
+    for (let i = 0; i < draggingSize; i++) {
+      if (isOccupied(x, y + i)) return;
     }
   }
 
@@ -137,7 +135,7 @@ function placeShip(x, y) {
     x,
     y,
     size: draggingSize,
-    vertical: flippedVertical,
+    vertical: draggingVertical,
   });
 
   const idx = shipSelections[currentPlayer].indexOf(draggingSize);
