@@ -81,12 +81,13 @@ function getHitMiss(player, x, y) {
 
 function createShipElement(size) {
   const ship = document.createElement("div");
-  ship.className = "ship" + (isVertical ? " vertical" : "");
+  ship.className = "ship";
   ship.draggable = true;
   ship.dataset.size = size;
   ship.dataset.vertical = isVertical ? "true" : "false";
   ship.style.setProperty("--size", size);
   ship.textContent = `🚢 ${size}`;
+  if (isVertical) ship.classList.add("vertical");
 
   ship.ondragstart = () => {
     draggingSize = size;
@@ -100,8 +101,6 @@ function renderShipSelection() {
   shipSelectionDiv.innerHTML = "";
   for (const size of shipSelections[currentPlayer]) {
     const ship = createShipElement(size);
-    if (isVertical) ship.classList.add("vertical");
-    ship.dataset.vertical = isVertical ? "true" : "false";
     shipSelectionDiv.appendChild(ship);
   }
 }
@@ -243,9 +242,8 @@ function guess(x, y) {
 
 rotateBtn.onclick = () => {
   isVertical = !isVertical;
-  renderShipSelection(); // Re-render ships with updated orientation
+  renderShipSelection();
 };
-
 
 function resetGame() {
   resetShipSelections();
