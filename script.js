@@ -85,9 +85,16 @@ function createShipElement(size) {
   ship.draggable = true;
   ship.dataset.size = size;
   ship.dataset.vertical = isVertical ? "true" : "false";
-  ship.style.setProperty("--size", size);
   ship.textContent = `🚢 ${size}`;
-  if (isVertical) ship.classList.add("vertical");
+
+  if (isVertical) {
+    ship.classList.add("vertical");
+    ship.style.width = "30px";
+    ship.style.height = `${size * 30}px`;
+  } else {
+    ship.style.width = `${size * 30}px`;
+    ship.style.height = "30px";
+  }
 
   ship.ondragstart = () => {
     draggingSize = size;

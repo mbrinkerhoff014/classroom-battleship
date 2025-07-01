@@ -34,20 +34,14 @@ body {
   color: white;
   font-weight: bold;
   margin: 5px;
-  height: 30px;
   line-height: 30px;
+  box-sizing: border-box;
+  text-align: center;
+  overflow: hidden;
 }
-
-.ship[data-size] {
-  width: calc(30px * var(--size));
-}
-
 .ship.vertical {
-  width: 30px !important;
-  height: calc(30px * var(--size)) !important;
   writing-mode: vertical-rl;
   text-orientation: mixed;
-  line-height: normal;
 }
 
 #instructions {
