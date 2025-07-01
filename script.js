@@ -7,7 +7,7 @@ let guesses = [[], []];
 let currentPlayer = 0;
 let phase = "placement";
 let draggingSize = null;
-let draggingVertical = false;
+let draggingVertical = true;
 
 const boardContainer = document.getElementById("board-container");
 const instructions = document.getElementById("instructions");
@@ -95,20 +95,20 @@ function createShipElement(size) {
   ship.className = "ship";
   ship.draggable = true;
   ship.dataset.size = size;
-  ship.dataset.vertical = "false";
+  ship.dataset.vertical = "true";
   ship.textContent = `🚢 ${size}`;
   ship.style.setProperty("--size", size);
 
   ship.onclick = (e) => {
     e.preventDefault();
-    const vertical = ship.dataset.vertical === "true";
-    ship.dataset.vertical = vertical ? "false" : "true";
+    const vertical = ship.dataset.vertical === "false";
+    ship.dataset.vertical = vertical ? "true" : "false";
     ship.classList.toggle("vertical");
   };
 
   ship.ondragstart = (e) => {
     draggingSize = size;
-    draggingVertical = ship.dataset.vertical === "true";
+    draggingVertical = ship.dataset.vertical === "false";
 
     // Hack: create drag ghost image matching ship size/direction
     const crt = ship.cloneNode(true);
