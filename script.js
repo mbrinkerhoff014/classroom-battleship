@@ -100,6 +100,8 @@ function renderShipSelection() {
   shipSelectionDiv.innerHTML = "";
   for (const size of shipSelections[currentPlayer]) {
     const ship = createShipElement(size);
+    if (isVertical) ship.classList.add("vertical");
+    ship.dataset.vertical = isVertical ? "true" : "false";
     shipSelectionDiv.appendChild(ship);
   }
 }
@@ -241,12 +243,9 @@ function guess(x, y) {
 
 rotateBtn.onclick = () => {
   isVertical = !isVertical;
-  document.querySelectorAll(".ship").forEach((ship) => {
-    ship.classList.toggle("vertical", isVertical);
-    ship.dataset.vertical = isVertical ? "true" : "false";
-    ship.style.setProperty("--size", ship.dataset.size);
-  });
+  renderShipSelection(); // Re-render ships with updated orientation
 };
+
 
 function resetGame() {
   resetShipSelections();
