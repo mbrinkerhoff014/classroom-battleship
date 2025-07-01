@@ -15,16 +15,16 @@ h1 {
 #instructions {
   font-family: 'Chango', cursive;
   font-size: 24px;
-  font-weight: bold;
+  font-weight: normal;
   margin-bottom: 15px;
 }
 
 .player1 {
-  color: royalblue;
+  color: rgb(225, 65, 108);
 }
 
 .player2 {
-  color: crimson;
+  color: rgb(20, 220, 170);
 }
 
 #ship-selection {
