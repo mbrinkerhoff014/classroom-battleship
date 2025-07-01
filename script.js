@@ -89,17 +89,15 @@ function createShipElement(size) {
   ship.className = "ship" + (isVertical ? " vertical" : "");
   ship.draggable = true;
   ship.dataset.size = size;
+  ship.style.setProperty("--size", size);
   ship.textContent = `🚢 ${size}`;
-  ship.style.width = isVertical ? "30px" : `${size * 30}px`;
-  ship.style.height = isVertical ? `${size * 30}px` : "30px";
-
   ship.ondragstart = () => {
     draggingSize = size;
     draggingShipElement = ship;
   };
-
   return ship;
 }
+
 
 function renderShipSelection() {
   shipSelectionDiv.innerHTML = "";
@@ -245,9 +243,10 @@ function guess(x, y) {
 
 rotateBtn.onclick = () => {
   isVertical = !isVertical;
-  document.querySelectorAll(".ship").forEach((ship) =>
-    ship.classList.toggle("vertical", isVertical)
-  );
+  document.querySelectorAll(".ship").forEach(ship => {
+    ship.classList.toggle("vertical", isVertical);
+    ship.style.setProperty("--size", ship.dataset.size);
+  });
 };
 
 function resetGame() {

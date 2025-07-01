@@ -38,18 +38,24 @@ body {
   line-height: 30px;
 }
 
-.ship[data-size="5"] { width: 150px; }
-.ship[data-size="4"] { width: 120px; }
-.ship[data-size="3"] { width: 90px; }
-.ship[data-size="2"] { width: 60px; }
+.ship[data-size] {
+  width: calc(30px * var(--size));
+}
 
 .ship.vertical {
+  width: 30px !important;
+  height: calc(30px * var(--size)) !important;
   writing-mode: vertical-rl;
   text-orientation: mixed;
-  width: 30px !important;
-  height: auto;
   line-height: normal;
 }
+
+#instructions {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 15px 0;
+}
+
 
 .hit { background-color: red; }
 .miss { background-color: lightgray; }
