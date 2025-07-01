@@ -84,17 +84,27 @@ function createShipElement(size) {
   ship.className = "ship";
   ship.draggable = true;
   ship.dataset.size = size;
-  ship.dataset.vertical = isVertical ? "true" : "false";
+  ship.dataset.vertical = "false"; // Default horizontal
   ship.textContent = `🚢 ${size}`;
+  ship.style.width = `${size * 30}px`;
+  ship.style.height = "30px";
 
-  if (isVertical) {
-    ship.classList.add("vertical");
-    ship.style.width = "30px";
-    ship.style.height = `${size * 30}px`;
-  } else {
-    ship.style.width = `${size * 30}px`;
-    ship.style.height = "30px";
-  }
+  // Click to rotate
+  ship.onclick = (e) => {
+    e.preventDefault(); // Prevent accidental drag on click
+    const vertical = ship.dataset.vertical === "true";
+    if (vertical) {
+      ship.dataset.vertical = "false";
+      ship.classList.remove("vertical");
+      ship.style.width = `${size * 30}px`;
+      ship.style.height = "30px";
+    } else {
+      ship.dataset.vertical = "true";
+      ship.classList.add("vertical");
+      ship.style.width = "30px";
+      ship.style.height = `${size * 30}px`;
+    }
+  };
 
   ship.ondragstart = () => {
     draggingSize = size;
