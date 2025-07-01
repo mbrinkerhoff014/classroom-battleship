@@ -1,17 +1,30 @@
 body {
-  font-family: Titan One, sans-serif;
+  font-family: Arial, sans-serif;
   text-align: center;
   margin: 20px;
 }
 
 h1 {
-  font-size: 28px;
+  font-family: 'Titan One', cursive;
+  font-size: 36px;
+  font-weight: normal;
+  margin-bottom: 10px;
+  color: darkblue;
 }
 
-h2 {
-  font-size: 22px;
+#instructions {
+  font-family: 'Chango', cursive;
+  font-size: 24px;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.player1 {
+  color: royalblue;
+}
+
+.player2 {
+  color: crimson;
 }
 
 #ship-selection {
