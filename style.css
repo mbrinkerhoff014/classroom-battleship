@@ -58,6 +58,7 @@ h2 {
 
 .cell.occupied {
   background-color: lightgreen;
+  cursor: pointer;
 }
 
 .cell.hit {

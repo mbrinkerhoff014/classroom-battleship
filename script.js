@@ -5,7 +5,7 @@ let placedShips = [[], []];
 let currentPlayer = 0;
 let phase = "placement";
 let draggingSize = null;
-let draggingShipElement = null;
+let draggingVertical = false;
 
 const boardContainer = document.getElementById("board-container");
 const instructions = document.getElementById("instructions");
@@ -52,7 +52,10 @@ function buildBoard(forPlayer) {
           for (let i = 0; i < ship.size; i++) {
             const sx = ship.x + (ship.vertical ? 0 : i);
             const sy = ship.y + (ship.vertical ? i : 0);
-            if (sx === r && sy === c) cell.classList.add("occupied");
+            if (sx === r && sy === c) {
+              cell.classList.add("occupied");
+              cell.onclick = () => removeShip(ship);
+            }
           }
         }
       }
@@ -85,14 +88,12 @@ function createShipElement(size) {
   ship.onclick = (e) => {
     e.preventDefault();
     const vertical = ship.dataset.vertical === "true";
+    ship.dataset.vertical = vertical ? "false" : "true";
+    ship.classList.toggle("vertical");
     if (vertical) {
-      ship.dataset.vertical = "false";
-      ship.classList.remove("vertical");
       ship.style.width = `${size * 30}px`;
       ship.style.height = "30px";
     } else {
-      ship.dataset.vertical = "true";
-      ship.classList.add("vertical");
       ship.style.width = "30px";
       ship.style.height = `${size * 30}px`;
     }
@@ -100,7 +101,7 @@ function createShipElement(size) {
 
   ship.ondragstart = () => {
     draggingSize = size;
-    draggingShipElement = ship;
+    draggingVertical = ship.dataset.vertical === "true";
   };
 
   return ship;
@@ -115,11 +116,9 @@ function renderShipSelection() {
 }
 
 function placeShip(x, y) {
-  if (draggingSize == null || !draggingShipElement) return;
+  if (draggingSize == null) return;
 
-  const vertical = draggingShipElement.dataset.vertical === "true";
-
-  if (vertical) {
+  if (draggingVertical) {
     if (y + draggingSize > GRID_SIZE) return;
     for (let i = 0; i < draggingSize; i++) {
       if (isOccupied(x, y + i)) return;
@@ -135,14 +134,22 @@ function placeShip(x, y) {
     x,
     y,
     size: draggingSize,
-    vertical: vertical,
+    vertical: draggingVertical,
   });
 
   const idx = shipSelections[currentPlayer].indexOf(draggingSize);
   if (idx !== -1) shipSelections[currentPlayer].splice(idx, 1);
 
   draggingSize = null;
-  draggingShipElement = null;
+  renderShipSelection();
+  buildBoard(currentPlayer);
+  doneBtn.style.display =
+    shipSelections[currentPlayer].length === 0 ? "inline-block" : "none";
+}
+
+function removeShip(ship) {
+  placedShips[currentPlayer] = placedShips[currentPlayer].filter((s) => s !== ship);
+  shipSelections[currentPlayer].push(ship.size);
   renderShipSelection();
   buildBoard(currentPlayer);
   doneBtn.style.display =
