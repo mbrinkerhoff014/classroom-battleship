@@ -1,9 +1,9 @@
 const GRID_SIZE = 10;
 const SHIP_SIZES = [5, 4, 3, 3, 2];
-let shipSelections = [[], []]; 
-let placedShips = [[], []]; 
+let shipSelections = [[], []];
+let placedShips = [[], []];
 let currentPlayer = 0;
-let phase = "placement"; 
+let phase = "placement";
 let draggingSize = null;
 let draggingShipElement = null;
 
@@ -18,7 +18,7 @@ function resetShipSelections() {
   placedShips = [[], []];
 }
 
-function buildBoard(forPlayer, forSetup = false) {
+function buildBoard(forPlayer) {
   boardContainer.innerHTML = "";
   boardContainer.appendChild(document.createElement("div"));
 
@@ -42,11 +42,11 @@ function buildBoard(forPlayer, forSetup = false) {
       if (phase === "placement" && forPlayer === currentPlayer) {
         cell.ondragover = (e) => e.preventDefault();
         cell.ondrop = () => placeShip(r, c);
-        cell.onclick = () => removeShipPart(r, c);
       } else if (phase === "gameplay" && forPlayer !== currentPlayer) {
         cell.onclick = () => guess(r, c);
       }
 
+      // Placement phase - show occupied
       if (phase === "placement" && forPlayer === currentPlayer) {
         for (const ship of placedShips[forPlayer]) {
           for (let i = 0; i < ship.size; i++) {
@@ -57,24 +57,19 @@ function buildBoard(forPlayer, forSetup = false) {
         }
       }
 
+      // Gameplay phase - show hit/miss
       if (phase === "gameplay" && forPlayer !== currentPlayer) {
-        const hitMiss = getHitMiss(forPlayer, r, c);
-        if (hitMiss === "hit") cell.classList.add("hit");
-        else if (hitMiss === "miss") cell.classList.add("miss");
+        const guesses = placedShips[currentPlayer].guesses || [];
+        for (const g of guesses) {
+          if (g.x === r && g.y === c) {
+            cell.classList.add(g.hit ? "hit" : "miss");
+          }
+        }
       }
 
       boardContainer.appendChild(cell);
     }
   }
-}
-
-function getHitMiss(player, x, y) {
-  const opponent = (player + 1) % 2;
-  const guesses = placedShips[opponent].guesses || [];
-  for (const g of guesses) {
-    if (g.x === x && g.y === y) return g.hit ? "hit" : "miss";
-  }
-  return null;
 }
 
 function createShipElement(size) {
@@ -122,9 +117,9 @@ function renderShipSelection() {
 function placeShip(x, y) {
   if (draggingSize == null || !draggingShipElement) return;
 
-  const shipVertical = draggingShipElement.dataset.vertical === "true";
+  const vertical = draggingShipElement.dataset.vertical === "true";
 
-  if (shipVertical) {
+  if (vertical) {
     if (y + draggingSize > GRID_SIZE) return;
     for (let i = 0; i < draggingSize; i++) {
       if (isOccupied(x, y + i)) return;
@@ -140,7 +135,7 @@ function placeShip(x, y) {
     x,
     y,
     size: draggingSize,
-    vertical: shipVertical,
+    vertical: vertical,
   });
 
   const idx = shipSelections[currentPlayer].indexOf(draggingSize);
@@ -149,7 +144,7 @@ function placeShip(x, y) {
   draggingSize = null;
   draggingShipElement = null;
   renderShipSelection();
-  buildBoard(currentPlayer, true);
+  buildBoard(currentPlayer);
   doneBtn.style.display =
     shipSelections[currentPlayer].length === 0 ? "inline-block" : "none";
 }
@@ -165,26 +160,6 @@ function isOccupied(x, y) {
   return false;
 }
 
-function removeShipPart(x, y) {
-  if (phase !== "placement") return;
-  const ships = placedShips[currentPlayer];
-  for (let i = 0; i < ships.length; i++) {
-    const ship = ships[i];
-    for (let j = 0; j < ship.size; j++) {
-      const sx = ship.x + (ship.vertical ? 0 : j);
-      const sy = ship.y + (ship.vertical ? j : 0);
-      if (sx === x && sy === y) {
-        ships.splice(i, 1);
-        shipSelections[currentPlayer].push(ship.size);
-        renderShipSelection();
-        buildBoard(currentPlayer, true);
-        doneBtn.style.display = "none";
-        return;
-      }
-    }
-  }
-}
-
 doneBtn.onclick = () => {
   if (phase === "gameover") {
     resetGame();
@@ -195,16 +170,14 @@ doneBtn.onclick = () => {
     currentPlayer = 1;
     instructions.textContent = "Player 2: Drag your ships onto the board";
     renderShipSelection();
-    buildBoard(currentPlayer, true);
+    buildBoard(currentPlayer);
     doneBtn.style.display = "none";
-    status.textContent = "";
   } else {
     phase = "gameplay";
     currentPlayer = 0;
     instructions.textContent = "Player 1's turn! Answer a card, then guess.";
-    status.textContent = "";
     shipSelectionDiv.innerHTML = "";
-    buildBoard(1, false);
+    buildBoard(1);
     doneBtn.style.display = "none";
   }
 };
@@ -212,13 +185,15 @@ doneBtn.onclick = () => {
 function guess(x, y) {
   if (phase !== "gameplay") return;
   const opponent = (currentPlayer + 1) % 2;
-  const guesses = placedShips[currentPlayer].guesses || [];
-  if (guesses.some((g) => g.x === x && g.y === y)) return;
+  placedShips[currentPlayer].guesses = placedShips[currentPlayer].guesses || [];
 
-  const opponentShips = placedShips[opponent];
+  if (placedShips[currentPlayer].guesses.some((g) => g.x === x && g.y === y))
+    return;
+
+  const ships = placedShips[opponent];
   let hit = false;
 
-  outer: for (const ship of opponentShips) {
+  outer: for (const ship of ships) {
     for (let i = 0; i < ship.size; i++) {
       const sx = ship.x + (ship.vertical ? 0 : i);
       const sy = ship.y + (ship.vertical ? i : 0);
@@ -229,20 +204,18 @@ function guess(x, y) {
     }
   }
 
-  guesses.push({ x, y, hit });
-  placedShips[currentPlayer].guesses = guesses;
-
-  buildBoard(opponent, false);
+  placedShips[currentPlayer].guesses.push({ x, y, hit });
+  buildBoard(opponent);
 
   if (hit) {
     status.textContent = "Hit!";
+    const totalHits = placedShips[currentPlayer].guesses.filter((g) => g.hit).length;
     const totalShipCells = SHIP_SIZES.reduce((a, b) => a + b);
-    const totalHits = guesses.filter((g) => g.hit).length;
     if (totalHits === totalShipCells) {
       instructions.textContent = `Player ${currentPlayer + 1} Wins!`;
       phase = "gameover";
       doneBtn.style.display = "inline-block";
-      doneBtn.textContent = "Restart Game";
+      doneBtn.textContent = "Restart";
       return;
     }
   } else {
@@ -251,11 +224,12 @@ function guess(x, y) {
   }
 
   instructions.textContent = `Player ${currentPlayer + 1}'s turn! Answer a card, then guess.`;
-  buildBoard(currentPlayer === 0 ? 1 : 0, false);
+  buildBoard(currentPlayer === 0 ? 1 : 0);
 }
 
 function resetGame() {
   resetShipSelections();
+  placedShips = [[], []];
   phase = "placement";
   currentPlayer = 0;
   status.textContent = "";
@@ -263,7 +237,7 @@ function resetGame() {
   doneBtn.textContent = "Done";
   doneBtn.style.display = "none";
   renderShipSelection();
-  buildBoard(currentPlayer, true);
+  buildBoard(currentPlayer);
 }
 
 resetGame();
